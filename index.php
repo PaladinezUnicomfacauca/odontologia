@@ -14,7 +14,7 @@ if (!$loggedIn && $controllerName !== 'auth') {
     exit;
 }
 
-if ($loggedIn && $controllerName === 'auth') {
+if ($loggedIn && $controllerName === 'auth' && $action !== 'logout') {
     header('Location: index.php?controller=home&action=index');
     exit;
 }
