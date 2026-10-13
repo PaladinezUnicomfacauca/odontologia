@@ -14,7 +14,10 @@ $usuarioActual = $_SESSION['nombre'] ?? null;
 </head>
 <body>
     <header class="topbar">
-        <div class="brand">Clínica Odontológica</div>
+        <a href="index.php?controller=home&action=index" class="brand-link">
+            <!-- <img src="assets/img/logoWhite.png" alt="Logo" class="logo"> -->
+            <div class="brand">Lúmina Dental</div>
+        </a>
         <nav class="nav">
             <?php if (!empty($_SESSION['usuario_id'])): ?>
                 <a href="index.php?controller=home&action=index">Inicio</a>
