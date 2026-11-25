@@ -8,6 +8,42 @@ require __DIR__ . '/../layout/header.php';
     <a href="index.php?controller=usuarios&action=new" class="btn">Nuevo usuario</a>
 </div>
 
+<form class="table-filters" method="GET" action="index.php">
+    <input type="hidden" name="controller" value="usuarios">
+    <input type="hidden" name="action" value="index">
+
+    <label>
+        Buscar usuario
+        <input type="search" name="search" value="<?php echo htmlspecialchars($filtros['search']); ?>" placeholder="Nombre, documento, teléfono o correo">
+    </label>
+
+    <label>
+        Rol
+        <select name="id_rol">
+            <option value="">Todos</option>
+            <?php foreach ($roles as $rol): ?>
+                <option value="<?php echo (int) $rol['id_rol']; ?>" <?php echo ((int) $filtros['id_rol'] === (int) $rol['id_rol']) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($rol['nombre_rol']); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </label>
+
+    <label>
+        Estado
+        <select name="activo">
+            <option value="">Todos</option>
+            <option value="1" <?php echo ($filtros['activo'] === '1') ? 'selected' : ''; ?>>Activo</option>
+            <option value="0" <?php echo ($filtros['activo'] === '0') ? 'selected' : ''; ?>>Inactivo</option>
+        </select>
+    </label>
+
+    <div class="filter-actions">
+        <button type="submit" class="btn">Filtrar</button>
+        <a href="index.php?controller=usuarios&action=index" class="btn secondary">Limpiar</a>
+    </div>
+</form>
+
 <table>
     <thead>
         <tr>
@@ -37,6 +73,11 @@ require __DIR__ . '/../layout/header.php';
                 </td>
             </tr>
         <?php endforeach; ?>
+        <?php if (!$usuarios): ?>
+            <tr>
+                <td colspan="8" class="empty-table">No se encontraron usuarios con los filtros seleccionados.</td>
+            </tr>
+        <?php endif; ?>
     </tbody>
 </table>
 

@@ -31,14 +31,51 @@ class Usuario
 
     public function getAll(): array
     {
+        return $this->filter([]);
+    }
+
+    public function filter(array $filters = []): array
+    {
         $sql = "
             SELECT u.*, r.nombre_rol
             FROM usuarios u
             INNER JOIN roles r ON r.id_rol = u.id_rol
-            ORDER BY u.id_usuario DESC
         ";
 
-        $stmt = $this->db->query($sql);
+        $conditions = [];
+        $params = [];
+
+        if (!empty($filters['search'])) {
+            $search = '%' . $filters['search'] . '%';
+            $conditions[] = "(u.nombre LIKE :search_nombre
+                OR u.numero_documento LIKE :search_documento
+                OR u.telefono LIKE :search_telefono
+                OR u.correo LIKE :search_correo)";
+            $params[':search_nombre'] = $search;
+            $params[':search_documento'] = $search;
+            $params[':search_telefono'] = $search;
+            $params[':search_correo'] = $search;
+        }
+
+        if (!empty($filters['id_rol'])) {
+            $conditions[] = 'u.id_rol = :id_rol';
+            $params[':id_rol'] = (int) $filters['id_rol'];
+        }
+
+        $activo = $filters['activo'] ?? null;
+        if ($activo !== '' && $activo !== null) {
+            $conditions[] = 'u.activo = :activo';
+            $params[':activo'] = (int) $activo;
+        }
+
+        if ($conditions) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $sql .= ' ORDER BY u.id_usuario DESC';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 

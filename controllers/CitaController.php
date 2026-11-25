@@ -7,7 +7,16 @@ class CitaController
     public function index(): void
     {
         $citaModel = new Cita();
-        $citas = $citaModel->getAll();
+        $filters = [
+            'search' => trim($_GET['search'] ?? ''),
+            'motivo' => trim($_GET['motivo'] ?? ''),
+            'id_estado_cita' => (int) ($_GET['id_estado_cita'] ?? 0),
+            'fecha' => trim($_GET['fecha'] ?? ''),
+        ];
+        $citas = $citaModel->filter($filters);
+        $estados = $citaModel->getEstados();
+        $motivos = $citaModel->getMotivos();
+        $filtros = $filters;
 
         require __DIR__ . '/../views/citas/index.php';
     }

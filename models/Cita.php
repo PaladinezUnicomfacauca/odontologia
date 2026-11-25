@@ -11,6 +11,11 @@ class Cita
 
     public function getAll(): array
     {
+        return $this->filter([]);
+    }
+
+    public function filter(array $filters = []): array
+    {
         $sql = "
             SELECT c.*, 
                    p.nombre AS paciente,
@@ -22,10 +27,44 @@ class Cita
             INNER JOIN usuarios o ON o.id_usuario = c.id_usuario_odontologo
             INNER JOIN usuarios a ON a.id_usuario = c.id_usuario_administrador
             INNER JOIN estados_cita e ON e.id_estado_cita = c.id_estado_cita
-            ORDER BY c.fecha DESC, c.hora DESC
         ";
 
-        $stmt = $this->db->query($sql);
+        $conditions = [];
+        $params = [];
+
+        if (!empty($filters['search'])) {
+            $search = '%' . $filters['search'] . '%';
+            $conditions[] = "(p.nombre LIKE :search_paciente
+                OR o.nombre LIKE :search_odontologo
+                OR a.nombre LIKE :search_administrador)";
+            $params[':search_paciente'] = $search;
+            $params[':search_odontologo'] = $search;
+            $params[':search_administrador'] = $search;
+        }
+
+        if (!empty($filters['motivo'])) {
+            $conditions[] = 'c.motivo = :motivo';
+            $params[':motivo'] = $filters['motivo'];
+        }
+
+        if (!empty($filters['id_estado_cita'])) {
+            $conditions[] = 'c.id_estado_cita = :id_estado_cita';
+            $params[':id_estado_cita'] = (int) $filters['id_estado_cita'];
+        }
+
+        if (!empty($filters['fecha'])) {
+            $conditions[] = 'c.fecha = :fecha';
+            $params[':fecha'] = $filters['fecha'];
+        }
+
+        if ($conditions) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $sql .= ' ORDER BY c.fecha DESC, c.hora DESC';
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 
@@ -62,6 +101,17 @@ class Cita
     public function getEstados(): array
     {
         $stmt = $this->db->query('SELECT * FROM estados_cita ORDER BY id_estado_cita');
+        return $stmt->fetchAll();
+    }
+
+    public function getMotivos(): array
+    {
+        $stmt = $this->db->query("
+            SELECT DISTINCT motivo
+            FROM citas
+            WHERE motivo IS NOT NULL AND motivo <> ''
+            ORDER BY motivo
+        ");
         return $stmt->fetchAll();
     }
 

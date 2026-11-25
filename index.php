@@ -8,8 +8,8 @@ require __DIR__ . '/models/Database.php';
 
 $loggedIn = isset($_SESSION['usuario_id']);
 
-$controllerName = $_GET['controller'] ?? ($loggedIn ? 'home' : 'auth');
-$action = $_GET['action'] ?? 'index';
+$controllerName = $_GET['controller'] ?? 'home';
+$action = $_GET['action'] ?? ($controllerName === 'auth' ? 'login' : 'index');
 
 $controllerMap = [
     'auth' => 'AuthController',
@@ -99,7 +99,7 @@ if ($errorTitle !== null) {
 }
 
 // Mantener las restricciones de sesión del sistema.
-if (!$loggedIn && $controllerName !== 'auth') {
+if (!$loggedIn && !in_array($controllerName, ['auth', 'home'], true)) {
     header('Location: index.php?controller=auth&action=login');
     exit;
 }

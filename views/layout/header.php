@@ -15,17 +15,21 @@ $usuarioActual = $_SESSION['nombre'] ?? null;
 <body>
     <header class="topbar">
         <a href="index.php?controller=home&action=index" class="brand-link">
-            <!-- <img src="assets/img/logoWhite.png" alt="Logo" class="logo"> -->
+            <img src="assets/img/logoWhite.png" alt="Logo" class="logo">
             <div class="brand">Lúmina Dental</div>
         </a>
         <nav class="nav">
             <?php if (!empty($_SESSION['usuario_id'])): ?>
                 <a href="index.php?controller=home&action=index">Inicio</a>
+                <a href="index.php?controller=home&action=index#servicios">Servicios</a>
+                <a href="index.php?controller=home&action=index#nosotros">Nosotros</a>
                 <a href="index.php?controller=usuarios&action=index">Usuarios</a>
                 <a href="index.php?controller=citas&action=index">Citas</a>
                 <span class="muted">Hola, <?php echo htmlspecialchars($_SESSION['nombre'] ?? 'Usuario'); ?></span>
                 <a href="index.php?controller=auth&action=logout">Cerrar sesión</a>
             <?php else: ?>
+                <a href="index.php?controller=home&action=index#servicios">Servicios</a>
+                <a href="index.php?controller=home&action=index#nosotros">Nosotros</a>
                 <a href="index.php?controller=auth&action=login">Iniciar sesión</a>
             <?php endif; ?>
         </nav>

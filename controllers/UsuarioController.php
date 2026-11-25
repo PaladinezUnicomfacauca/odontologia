@@ -7,7 +7,14 @@ class UsuarioController
     public function index(): void
     {
         $usuarioModel = new Usuario();
-        $usuarios = $usuarioModel->getAll();
+        $filters = [
+            'search' => trim($_GET['search'] ?? ''),
+            'id_rol' => (int) ($_GET['id_rol'] ?? 0),
+            'activo' => $_GET['activo'] ?? '',
+        ];
+        $usuarios = $usuarioModel->filter($filters);
+        $roles = $usuarioModel->getRoles();
+        $filtros = $filters;
 
         require __DIR__ . '/../views/usuarios/index.php';
     }
